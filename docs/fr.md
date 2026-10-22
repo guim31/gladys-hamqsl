@@ -56,7 +56,7 @@ Toutes les fonctionnalités sont en lecture seule et gardent leur historique, sa
 | Bz (nT)                                                        | Compteur            | La composante nord-sud du champ magnétique interplanétaire, arrondie au nanotesla. Un Bz très négatif favorise orages et aurores.          |
 | 80-40 m jour … 12-10 m nuit                                    | Intensité du signal | 0 mauvaise, 1 moyenne, 2 bonne. Le tableau de bord les affiche en barres d'antenne (aucune, 3 ou 5 barres).                                |
 | Bruit de fond                                                  | Texte               | Le niveau de bruit attendu en HF, tel que l'écrit N0NBH (S1-S2).                                                                           |
-| Champ géomagnétique                                            | Texte               | Calme, instable, actif, orage mineur ou majeur… dans la langue choisie.                                                                    |
+| Champ géomagnétique                                            | Texte               | Calme, agité, actif, orage mineur ou majeur… dans la langue choisie.                                                                       |
 | Aurore VHF, Es Europe 6 m / 4 m / 2 m, Es Amérique du Nord 2 m | État de l'entrée    | 1 quand N0NBH annonce l'ouverture, 0 quand la bande est fermée.                                                                            |
 | Mise à jour N0NBH                                              | Texte               | Date et heure des données, dans le fuseau horaire de Gladys.                                                                               |
 

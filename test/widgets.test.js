@@ -125,3 +125,21 @@ test('the configuration action answers in the four languages, under 200 characte
     assert.ok(text.length <= 200, text);
   }
 });
+
+test('the configuration action says when the feed is down, with the last values', async (t) => {
+  const api = createApi();
+  const w = await world(t, { api });
+  api.down = 503;
+  w.clock.advance(2 * 60 * 60 * 1000);
+  const { data } = await w.fake.action('check_now', {});
+  const message = data.message ?? data;
+  assert.equal(
+    message.fr,
+    'Flux HamQSL injoignable : valeurs de la lecture de 08:00. SFI 115, K 2, A 19, rayons X B6.3. ' +
+      'Bonnes : 30-20 m jour, 80-40 m nuit, 30-20 m nuit.',
+  );
+  assert.match(message.de, /Gut: 30-20 m Tag, 80-40 m Nacht/);
+  for (const text of Object.values(message)) {
+    assert.ok(text.length <= 200, text);
+  }
+});

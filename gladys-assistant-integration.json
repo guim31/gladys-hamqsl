@@ -356,7 +356,7 @@
           "label": {
             "en": "Solar flux (SFI)",
             "fr": "Flux solaire (SFI)",
-            "de": "Solarer Flux (SFI)",
+            "de": "Solarflux (SFI)",
             "es": "Flujo solar (SFI)"
           }
         },
@@ -630,7 +630,7 @@
           "label": {
             "en": "Solar flux (SFI)",
             "fr": "Flux solaire (SFI)",
-            "de": "Solarer Flux (SFI)",
+            "de": "Solarflux (SFI)",
             "es": "Flujo solar (SFI)"
           }
         },
@@ -689,7 +689,7 @@
       "description": {
         "en": "Solar flux, K and A indices, X-rays, and each HF band by day and by night.",
         "fr": "Flux solaire, indices K et A, rayons X, et chaque bande HF de jour et de nuit.",
-        "de": "Solarer Flux, K- und A-Index, Röntgen und jedes KW-Band bei Tag und Nacht.",
+        "de": "Solarflux, K- und A-Index, Röntgen und jedes KW-Band bei Tag und Nacht.",
         "es": "Flujo solar, índices K y A, rayos X, y cada banda HF de día y de noche."
       },
       "icon": "radio"

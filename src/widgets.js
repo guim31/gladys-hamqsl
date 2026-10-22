@@ -29,7 +29,7 @@ export const TEXT = {
     de: 'Warte auf HamQSL…',
     es: 'Esperando a HamQSL…',
   },
-  solarFlux: { en: 'Solar flux', fr: 'Flux solaire', de: 'Solarer Flux', es: 'Flujo solar' },
+  solarFlux: { en: 'Solar flux', fr: 'Flux solaire', de: 'Solarflux', es: 'Flujo solar' },
   kIndex: { en: 'K index', fr: 'Indice K', de: 'K-Index', es: 'Índice K' },
   aIndex: { en: 'A index', fr: 'Indice A', de: 'A-Index', es: 'Índice A' },
   xray: { en: 'X-ray', fr: 'Rayons X', de: 'Röntgen', es: 'Rayos X' },

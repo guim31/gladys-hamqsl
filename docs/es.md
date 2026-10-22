@@ -99,7 +99,7 @@ por alto lo que haya cambiado entretanto.
 
 **HamQSL: leer el boletín de propagación.** Salidas:
 
-- `text`: por ejemplo «Propagación HF (N0NBH, 07:42): SFI 115, K 2, A 19, rayos X B6.3. Día: buena en
+- `text`: por ejemplo «Propagación HF (N0NBH, 7:42): SFI 115, K 2, A 19, rayos X B6.3. Día: buena en
   30-20 m, regular en 80-40 m y 17-15 m, mala en 12-10 m. Noche: buena en 80-40 m y 30-20 m, regular en
   17-15 m, mala en 12-10 m.»;
 - `solar_flux`, `sunspots`, `k_index`, `a_index` (números, vacíos cuando N0NBH no tiene valor) y `xray`

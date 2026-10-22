@@ -44,7 +44,12 @@ export function registerHandlers(gladys, options = {}) {
 
   gladys.on('connected', async () => {
     try {
-      const config = normalizeConfig(await gladys.getConfig());
+      const config = await gladys.getConfig().then(normalizeConfig, (err) => {
+        // Defaults rather than no reading at all: a reconnection or a save of
+        // the form brings the real configuration.
+        logger.warn(`Cannot read the configuration, defaults used: ${err.message}`);
+        return normalizeConfig({});
+      });
       if (started) {
         // A reconnection (Gladys restarted): publish everything again.
         await monitor.resync(config);
@@ -68,6 +73,8 @@ export function registerHandlers(gladys, options = {}) {
   gladys.onPoll(whenReady((device) => monitor.poll(device)));
 
   gladys.onDeviceCreated(whenReady((device) => monitor.onDeviceCreated(device)));
+
+  gladys.onDeviceUpdated(whenReady((device) => monitor.onDeviceUpdated(device)));
 
   gladys.onConfigUpdated(whenReady((newConfig) => monitor.reconfigure(normalizeConfig(newConfig))));
 

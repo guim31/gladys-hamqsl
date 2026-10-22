@@ -46,7 +46,7 @@ Alle Funktionen sind schreibgeschützt und speichern ihren Verlauf, außer den T
 
 | Funktion                                                  | Typ in Gladys          | Werte                                                                                                                                       |
 | --------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Solarer Flux (SFI)                                        | Zähler                 | Solarer Flux bei 10,7 cm, in Solar Flux Units. Über 100 öffnen sich die hohen Bänder, über 150 sind sie hervorragend.                       |
+| Solarflux (SFI)                                           | Zähler                 | Solarflux bei 10,7 cm, in Solar Flux Units. Über 100 öffnen sich die hohen Bänder, über 150 sind sie hervorragend.                          |
 | Sonnenfleckenzahl                                         | Zähler                 | Die tägliche Sonnenfleckenzahl.                                                                                                             |
 | K-Index                                                   | Zähler                 | 0 bis 9, planetar, alle 3 Stunden. 4 = aktiv, ab 5 = Sturm (G1 bis G5).                                                                     |
 | A-Index                                                   | Zähler                 | 0 bis 400, der Tagesmittelwert der geomagnetischen Aktivität.                                                                               |
@@ -55,7 +55,7 @@ Alle Funktionen sind schreibgeschützt und speichern ihren Verlauf, außer den T
 | Bz (nT)                                                   | Zähler                 | Die Nord-Süd-Komponente des interplanetaren Magnetfelds, auf Nanotesla gerundet. Ein stark negatives Bz begünstigt Stürme und Polarlichter. |
 | 80-40 m Tag … 12-10 m Nacht                               | Signalstärke           | 0 Schlecht, 1 Mittel, 2 Gut. Das Dashboard zeigt sie als Antennenbalken (keiner, 3 oder 5 Balken).                                          |
 | Grundrauschen                                             | Text                   | Der erwartete Rauschpegel auf KW, so wie N0NBH ihn angibt (S1-S2).                                                                          |
-| Erdmagnetfeld                                             | Text                   | Ruhig, unbeständig, aktiv, leichter oder starker Sturm … in der gewählten Sprache.                                                          |
+| Erdmagnetfeld                                             | Text                   | Ruhig, unruhig, aktiv, leichter oder starker Sturm … in der gewählten Sprache.                                                              |
 | UKW-Aurora, Es Europa 6 m / 4 m / 2 m, Es Nordamerika 2 m | Status des Eingangs    | 1, wenn N0NBH die Öffnung meldet, 0, wenn das Band geschlossen ist.                                                                         |
 | N0NBH-Aktualisierung                                      | Text                   | Datum und Uhrzeit der Daten, in der Zeitzone von Gladys.                                                                                    |
 

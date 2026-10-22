@@ -32,18 +32,23 @@ export async function readBulletin(monitor) {
 /** Configuration action: the main values and the good bands, in every language. */
 export async function checkNow(monitor) {
   const feed = await monitor.fresh();
-  logger.info(`Check requested: ${feed === null ? 'HamQSL feed unreachable' : 'feed read'}`);
+  const down = monitor.failing.has('feed');
+  logger.info(`Check requested: ${down ? 'HamQSL feed unreachable' : 'feed read'}`);
   if (feed === null) {
     return render(STATUS, 'noValue');
   }
   return Object.fromEntries(
-    LANGUAGES.map((language) => [
-      language,
-      PHRASES[language].check({
-        indices: indices(feed, language) || '–',
-        good: goodBands(feed, language),
-        time: formatTime(monitor.lastSuccessAt, language),
-      }),
-    ]),
+    LANGUAGES.map((language) => {
+      const time = formatTime(monitor.lastSuccessAt, language);
+      const values = indices(feed, language) || '–';
+      const good = goodBands(feed, language);
+      // The last reading failed: said first, then the values of the last good one.
+      return [
+        language,
+        down
+          ? `${STATUS[language].stale_read({ time })} ${values}. ${good}.`
+          : PHRASES[language].check({ indices: values, good, time }),
+      ];
+    }),
   );
 }

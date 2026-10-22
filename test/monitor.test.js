@@ -256,3 +256,43 @@ test('a new language republishes the device names and the translated texts', asy
   assert.equal(w.fake.discoveredDevices.at(-1).name, 'KW-Ausbreitung (HamQSL)');
   assert.equal(valueOf(w, 'geomag_field'), 'Ruhig');
 });
+
+test('a discovery refused at the start is tried again, and the timer runs anyway', async (t) => {
+  t.mock.timers.enable({ apis: ['setInterval', 'setTimeout'] });
+  const api = createApi();
+  const clock = createClock();
+  const w = await createWorld({ api, clock, timers: true, connect: false });
+  t.after(() => w.app.stop());
+  const publish = t.mock.method(w.gladys, 'publishDiscoveredDevices', async () => {
+    throw new Error('HTTP 503');
+  });
+  await w.gladys.connect();
+  await w.app.ready;
+  await w.monitor.running;
+  assert.equal(w.monitor.discovered, false);
+  publish.mock.restore();
+  clock.advance(60 * 60 * 1000);
+  t.mock.timers.tick(60 * 60 * 1000);
+  await w.monitor.running;
+  assert.equal(api.requests.length, 2, 'the timer kept reading');
+  assert.equal(w.monitor.discovered, true);
+  assert.equal(w.fake.discoveredDevices.length, 1);
+});
+
+test('"Update" in the Discover tab publishes the states again', async (t) => {
+  const w = await world(t);
+  const device = await create(w);
+  const before = w.fake.states.length;
+  await w.fake.deviceUpdated(device);
+  assert.equal(w.fake.states.length, before + 23);
+});
+
+test('the onPoll fallback never reads within 30 minutes, whatever the interval', async (t) => {
+  const api = createApi();
+  const w = await world(t, { api, config: { refresh_interval: '30' } });
+  const device = await create(w);
+  const requests = api.requests.length;
+  w.clock.advance(20 * 60 * 1000);
+  await w.monitor.poll(device);
+  assert.equal(api.requests.length, requests);
+});

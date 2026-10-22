@@ -19,6 +19,7 @@
 // -----------------------------------------------------------------------------
 
 import { createLogger } from '@gladysassistant/integration-sdk';
+import { normalizeConfig } from './config.js';
 import { bandKey, buildDevice, deviceIds } from './device.js';
 import { BANDS, CONDITIONS, PERIODS, VHF, XRAY_CLASSES, fetchFeed } from './hamqsl.js';
 import {
@@ -48,6 +49,7 @@ const FLARE_RANK = XRAY_CLASSES.indexOf('M');
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
+const MIN_READ_GAP_MS = 30 * MINUTE;
 
 export const DEFAULT_TIMINGS = {
   heartbeatMs: 12 * HOUR,
@@ -79,7 +81,9 @@ export class Monitor {
     this.timers = timers;
     this.now = now ?? (() => Date.now());
     this.timings = { ...DEFAULT_TIMINGS, ...timings };
-    this.config = null;
+    this.config = normalizeConfig({});
+    // False until Gladys accepted the discovered device: tried again at every cycle.
+    this.discovered = false;
     this.data = emptyData();
     // The feed of the last successful reading.
     this.feed = null;
@@ -122,9 +126,11 @@ export class Monitor {
     if (saved?.version === 1) {
       this.data = { ...emptyData(), ...saved };
     }
+    // The timer first: a Gladys refusing the discovery at its own start must
+    // not leave the integration without readings.
+    this.schedule();
     await this.publishDiscovered();
     logger.info(`Started: HamQSL feed read every ${config.refreshMinutes} min`);
-    this.schedule();
     this.runCycle();
   }
 
@@ -175,7 +181,13 @@ export class Monitor {
   }
 
   async publishDiscovered() {
-    await this.gladys.publishDiscoveredDevices([buildDevice(this.gladys, this.config.language)]);
+    try {
+      await this.gladys.publishDiscoveredDevices([buildDevice(this.gladys, this.config.language)]);
+      this.discovered = true;
+      this.recovered('discovery', 'The device is published again');
+    } catch (err) {
+      this.failed('discovery', 'warn', `Publishing the device failed: ${err.message}`);
+    }
   }
 
   isCreated() {
@@ -199,6 +211,9 @@ export class Monitor {
 
   async cycle() {
     this.lastCycleAt = this.now();
+    if (!this.discovered) {
+      await this.publishDiscovered();
+    }
     let feed;
     try {
       feed = await fetchFeed(this.fetch);
@@ -436,6 +451,15 @@ export class Monitor {
 
   // --- Gladys events -----------------------------------------------------------
 
+  /** "Update" in the Discover tab: the SDK forgot the states, published again. */
+  async onDeviceUpdated(device) {
+    if (device?.external_id !== deviceIds(this.gladys).device) {
+      return;
+    }
+    await this.publishStates();
+    this.requestRefresh();
+  }
+
   async onDeviceCreated(device) {
     if (device?.external_id !== deviceIds(this.gladys).device) {
       return;
@@ -453,8 +477,10 @@ export class Monitor {
     if (device?.external_id !== deviceIds(this.gladys).device) {
       return;
     }
-    // Read again only if the last cycle is older than half the interval.
-    if (this.now() - this.lastCycleAt >= (this.config.refreshMinutes * MINUTE) / 2) {
+    // Read again only if the last cycle is older than half the interval, and
+    // never within the 30 minutes N0NBH asks for.
+    const gap = Math.max((this.config.refreshMinutes * MINUTE) / 2, MIN_READ_GAP_MS);
+    if (this.now() - this.lastCycleAt >= gap) {
       await this.runCycle();
     } else {
       await this.publishStates();

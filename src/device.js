@@ -74,7 +74,7 @@ export const NAMES = {
   },
   de: {
     device: 'KW-Ausbreitung (HamQSL)',
-    solar_flux: 'Solarer Flux (SFI)',
+    solar_flux: 'Solarflux (SFI)',
     sunspots: 'Sonnenfleckenzahl',
     k_index: 'K-Index',
     a_index: 'A-Index',

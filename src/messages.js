@@ -37,7 +37,7 @@ export const GEOMAG_NAMES = {
   fr: {
     'VR QUIET': 'Très calme',
     QUIET: 'Calme',
-    UNSETTLD: 'Instable',
+    UNSETTLD: 'Agité',
     ACTIVE: 'Actif',
     'MIN STORM': 'Orage mineur',
     'MAJ STORM': 'Orage majeur',
@@ -46,7 +46,7 @@ export const GEOMAG_NAMES = {
   de: {
     'VR QUIET': 'Sehr ruhig',
     QUIET: 'Ruhig',
-    UNSETTLD: 'Unbeständig',
+    UNSETTLD: 'Unruhig',
     ACTIVE: 'Aktiv',
     'MIN STORM': 'Leichter Sturm',
     'MAJ STORM': 'Starker Sturm',
@@ -145,24 +145,28 @@ export const PHRASES = {
 export const STATUS = {
   en: {
     feedDown: 'HamQSL feed unreachable: the last values are kept.',
+    stale_read: ({ time }) => `HamQSL feed unreachable: values of the reading of ${time}.`,
     stale: ({ hours }) => `The HamQSL feed has not been updated for ${hours} h.`,
     initFailed: 'Initialization failed: see the logs of the integration.',
     noValue: 'The HamQSL feed could not be read yet.',
   },
   fr: {
     feedDown: 'Flux HamQSL injoignable : les dernières valeurs sont gardées.',
+    stale_read: ({ time }) => `Flux HamQSL injoignable : valeurs de la lecture de ${time}.`,
     stale: ({ hours }) => `Le flux HamQSL n'a pas été mis à jour depuis ${hours} h.`,
     initFailed: "Échec de l'initialisation : voir les journaux de l'intégration.",
     noValue: "Le flux HamQSL n'a pas encore pu être lu.",
   },
   de: {
     feedDown: 'HamQSL-Feed nicht erreichbar: die letzten Werte bleiben erhalten.',
+    stale_read: ({ time }) => `HamQSL-Feed nicht erreichbar: Werte der Lesung von ${time}.`,
     stale: ({ hours }) => `Der HamQSL-Feed wurde seit ${hours} h nicht aktualisiert.`,
     initFailed: 'Initialisierung fehlgeschlagen: schau in die Protokolle der Integration.',
     noValue: 'Der HamQSL-Feed konnte noch nicht gelesen werden.',
   },
   es: {
     feedDown: 'Feed de HamQSL inaccesible: se conservan los últimos valores.',
+    stale_read: ({ time }) => `Feed de HamQSL inaccesible: valores de la lectura de las ${time}.`,
     stale: ({ hours }) => `El feed de HamQSL no se ha actualizado desde hace ${hours} h.`,
     initFailed: 'Error de inicialización: consulte los registros de la integración.',
     noValue: 'El feed de HamQSL aún no se ha podido leer.',
@@ -266,7 +270,9 @@ export function goodBands(data, language) {
   for (const period of PERIODS) {
     for (const band of BANDS) {
       if (data.bands[band.key][period] === 'good') {
-        items.push(`${band.name} ${PERIOD_NAMES[language][period].toLowerCase()}`);
+        // German nouns keep their capital: "30-20 m Tag".
+        const name = PERIOD_NAMES[language][period];
+        items.push(`${band.name} ${language === 'de' ? name : name.toLowerCase()}`);
       }
     }
   }
