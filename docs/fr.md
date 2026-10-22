@@ -1,67 +1,167 @@
-# Template de démonstration
+# HamQSL
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+La propagation radio HF et VHF dans Gladys, pour les radioamateurs : les données solaires et
+terrestres et l'état des bandes que Paul Herrman, N0NBH, publie sur
+[hamqsl.com](https://www.hamqsl.com/solar.html) — les chiffres du fameux « bandeau solaire » qu'on
+voit sur tant de sites de radioamateurs.
 
 ## Ce que vous obtenez
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+- Un **appareil « Propagation HF (HamQSL) »** : flux solaire (SFI), nombre de taches solaires,
+  indices K et A, classe des rayons X, vitesse du vent solaire, Bz, bruit de fond, champ
+  géomagnétique, l'état de chaque groupe de bandes HF de jour et de nuit (80-40 m, 30-20 m,
+  17-15 m, 12-10 m : mauvaise, moyenne ou bonne), les ouvertures VHF par aurore et sporadique E
+  (Es), et l'heure de la dernière mise à jour de N0NBH.
+- Un **widget de tableau de bord**, le tableau des bandes : les principaux indices en tuiles, puis
+  chaque bande de jour et de nuit avec une pastille de couleur.
+- **Trois déclencheurs de scène** : une bande devient bonne, un orage géomagnétique, une éruption
+  solaire de classe M ou X.
+- **Une action de scène** : le bulletin de propagation en un texte, à envoyer par message ou à lire
+  à voix haute.
+
+Rien à acheter, aucun compte : le flux est public. L'intégration ne fait que le lire.
+
+## Prérequis
+
+- Gladys Assistant **5.1.0** ou plus récent (widgets, déclencheurs et actions de scène).
+- Un accès internet de Gladys vers `www.hamqsl.com` (HTTPS).
+
+L'intégration s'installe depuis GitHub : **Intégrations → Installer depuis GitHub**, adresse
+`https://github.com/guim31/gladys-hamqsl`.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+| Réglage                  | Par défaut | Rôle                                                                                                                                                                          |
+| ------------------------ | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fréquence de mise à jour | 1 heure    | Rythme de lecture du flux : 30 minutes, 1, 2 ou 3 heures. N0NBH le met à jour environ une fois par heure et demande de ne pas le lire plus souvent que toutes les 30 minutes. |
+| Langue des textes        | Français   | Noms des fonctionnalités (à leur création) et textes envoyés aux scènes et à l'appareil (champ géomagnétique, bulletin).                                                      |
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+Enregistrez, puis ouvrez l'onglet **Découverte** et créez l'appareil. Ses valeurs arrivent aussitôt.
 
-## Actions
+Les noms des fonctionnalités sont figés à la création de l'appareil : changez la langue **avant**
+de le créer, ou supprimez-le et créez-le de nouveau.
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+## Appareil
 
-## Scènes
+Toutes les fonctionnalités sont en lecture seule et gardent leur historique, sauf les textes.
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+| Fonctionnalité                                                 | Type dans Gladys    | Valeurs                                                                                                                                    |
+| -------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Flux solaire (SFI)                                             | Compteur            | Flux solaire à 10,7 cm, en unités de flux solaire. Au-dessus de 100 les bandes hautes s'ouvrent ; au-dessus de 150 elles sont excellentes. |
+| Nombre de taches solaires                                      | Compteur            | Le nombre de taches solaires du jour.                                                                                                      |
+| Indice K                                                       | Compteur            | 0 à 9, planétaire, toutes les 3 heures. 4 = actif, 5 et plus = orage (G1 à G5).                                                            |
+| Indice A                                                       | Compteur            | 0 à 400, la moyenne quotidienne de l'activité géomagnétique.                                                                               |
+| Classe des rayons X                                            | Texte               | `A`, `B`, `C`, `M` ou `X` et un nombre (B6.3) : le flux de rayons X du Soleil. M et X perturbent la HF sur la face éclairée.               |
+| Vent solaire (km/s)                                            | Vitesse             | En km/s (l'unité est dans le nom : Gladys n'a pas d'unité km/s).                                                                           |
+| Bz (nT)                                                        | Compteur            | La composante nord-sud du champ magnétique interplanétaire, arrondie au nanotesla. Un Bz très négatif favorise orages et aurores.          |
+| 80-40 m jour … 12-10 m nuit                                    | Intensité du signal | 0 mauvaise, 1 moyenne, 2 bonne. Le tableau de bord les affiche en barres d'antenne (aucune, 3 ou 5 barres).                                |
+| Bruit de fond                                                  | Texte               | Le niveau de bruit attendu en HF, tel que l'écrit N0NBH (S1-S2).                                                                           |
+| Champ géomagnétique                                            | Texte               | Calme, agité, actif, orage mineur ou majeur… dans la langue choisie.                                                                       |
+| Aurore VHF, Es Europe 6 m / 4 m / 2 m, Es Amérique du Nord 2 m | État de l'entrée    | 1 quand N0NBH annonce l'ouverture, 0 quand la bande est fermée.                                                                            |
+| Mise à jour N0NBH                                              | Texte               | Date et heure des données, dans le fuseau horaire de Gladys.                                                                               |
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+Une valeur que N0NBH ne publie pas (« No Report ») est laissée de côté : la fonctionnalité garde sa
+valeur précédente, jamais un faux 0. L'appareil est rafraîchi par l'intégration elle-même ; Gladys
+ne l'interroge pas.
 
-## Tableau de bord
+L'indice K et les aurores sont ici tels que les donne HamQSL, pour la radio. Pour observer les
+aurores (prévision du Kp, alertes aurores), voir l'intégration
+[gladys-astronomy](https://github.com/guim31/gladys-astronomy), fondée sur les données de la NOAA.
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+## Widget de tableau de bord
+
+**État des bandes HF** : quatre tuiles (flux solaire, indice K, indice A, rayons X), puis une ligne
+par groupe de bandes et par période, le jour d'abord, avec une pastille verte (bonne), orange
+(moyenne) ou rouge (mauvaise). Le pied donne la source et l'heure de la mise à jour de N0NBH, et un
+bouton ouvre hamqsl.com.
+
+Ajoutez-le depuis l'éditeur du tableau de bord : **Ajouter un widget → HamQSL → État des bandes
+HF**. Il n'a aucun réglage.
+
+## Déclencheurs de scène
+
+**HamQSL : une bande devient bonne.** Un groupe de bandes passe de mauvaise ou moyenne à bonne.
+Filtres : les bandes (vide = toutes) et jour ou nuit (vide = les deux). Variables : bande
+(`80m_40m`…), période (`day`, `night`), bande et période en clair, condition précédente, flux
+solaire, indice K, et un résumé (« Bande 30-20 m bonne de jour (SFI 115, K 2, A 19) »).
+
+**HamQSL : orage géomagnétique.** L'indice K atteint 4 ou plus, puis chaque fois qu'il monte plus
+haut pendant le même épisode ; l'épisode se termine quand K redescend sous 4. Un orage qui monte de
+K 5 à K 7 déclenche deux fois (K 5, puis K 7) ; K 6 → 5 → 6 déclenche une fois. Filtre : les valeurs
+de K (K 4 = champ actif, K 5 à 9 = orages G1 à G5) ; pour n'être prévenu que des orages, choisissez
+K 5 à K 9. Variables : indice K, indice A, échelle NOAA (G0 à G5), champ géomagnétique en clair,
+résumé.
+
+**HamQSL : éruption solaire M ou X.** La classe des rayons X monte à M ou X (C → M, M → X, ou de
+nouveau M après une lecture plus calme). Filtre : la classe. Variables : classe (`M`, `X`), niveau
+(M2.1), résumé.
+
+La première lecture après l'installation sert de point de départ : elle ne déclenche rien. Les
+références sont gardées dans le volume de données de l'intégration : un redémarrage ne redéclenche
+rien et ne manque pas ce qui a changé entre-temps.
+
+## Action de scène
+
+**HamQSL : lire le bulletin de propagation.** Sorties :
+
+- `text` : par exemple « Propagation HF (N0NBH, 07:42) : SFI 115, K 2, A 19, rayons X B6.3. Jour :
+  bonne sur 30-20 m, moyenne sur 80-40 m et 17-15 m, mauvaise sur 12-10 m. Nuit : bonne sur 80-40 m
+  et 30-20 m, moyenne sur 17-15 m, mauvaise sur 12-10 m. » ;
+- `solar_flux`, `sunspots`, `k_index`, `a_index` (nombres, vides quand N0NBH n'a pas de valeur) et
+  `xray` (texte).
+
+Le flux n'est relu que si la dernière lecture est plus ancienne que la fréquence de mise à jour. Le
+bouton **Lire le flux maintenant** de la page de configuration donne aussitôt les indices et les
+bandes bonnes.
+
+## Exemples de scènes
+
+- **Bulletin du matin** : chaque jour à 7 h 30, « HamQSL : lire le bulletin de propagation », puis
+  envoyer la sortie `text` par Telegram, ou la faire lire par une enceinte.
+- **Le 10 mètres est ouvert** : déclencheur « une bande devient bonne », bande 12-10 m, jour →
+  notification « Le 10 m est ouvert, à vos micros ! » avec la variable résumé.
+- **Alerte orage** : déclencheur « orage géomagnétique », K 6 à K 9 → message avec le résumé, et un
+  rappel de regarder vers le nord la nuit si vous habitez à haute latitude.
+- **Black-out sur l'air** : déclencheur « éruption solaire M ou X », classe X → une notification
+  qui explique pourquoi les bandes HF se sont tues côté jour.
+
+## Source des données et politique d'usage
+
+Les données viennent du flux XML public de N0NBH, `https://www.hamqsl.com/solarxml.php`, lu sans
+compte ni clé, avec un User-Agent qui nomme cette intégration. N0NBH le met à jour environ une fois
+par heure et demande de le lire au plus toutes les 30 à 60 minutes : l'intégration le lit toutes
+les heures par défaut, et jamais plus souvent que toutes les 30 minutes (les actions réutilisent la
+dernière lecture quand elle est assez récente).
+
+Données solaires et terrestres offertes par Paul Herrman, N0NBH :
+[hamqsl.com/solar.html](https://www.hamqsl.com/solar.html). Merci à lui pour ce service, offert
+depuis des années à toute la communauté radioamateur.
+
+L'état des bandes est un modèle **global** calculé par N0NBH à partir des indices : il n'est mesuré
+ni à votre position, ni pour une liaison donnée. Non affiliée à HamQSL ni à N0NBH.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« Flux HamQSL injoignable »** dans la page de configuration : Gladys n'arrive pas à joindre
+  `www.hamqsl.com`. Vérifiez l'accès internet de Gladys ; les dernières valeurs sont gardées, et
+  l'intégration réessaie à chaque intervalle.
+- **« Le flux HamQSL n'a pas été mis à jour depuis N h »** : le flux répond, mais N0NBH ne l'a pas
+  mis à jour depuis plus de 6 heures. Rien à faire de votre côté : il revient en général de
+  lui-même.
+- **Une fonctionnalité n'a pas de valeur** : N0NBH publie « No Report » pour elle (le flux solaire
+  parfois, le sporadique E d'Amérique du Nord…). Elle revient avec le bulletin suivant.
+- **Les noms des fonctionnalités ne sont pas dans la bonne langue** : ils sont figés à la création.
+  Changez la langue, supprimez l'appareil et créez-le de nouveau depuis l'onglet Découverte.
+- **Plus de détails** : les journaux de l'intégration (Intégrations → HamQSL → journaux). Réglez la
+  variable d'environnement `LOG_LEVEL` sur `debug` pour voir chaque lecture.
+
+## Limites
+
+- Les conditions sont celles du modèle global de N0NBH, mis à jour toutes les heures : une ouverture
+  brève, une condition locale ou une liaison donnée n'y figurent pas.
+- La classe des rayons X est le flux au moment de la lecture : une éruption brève entre deux
+  lectures peut passer inaperçue.
+- L'indice K est l'indice planétaire, toutes les 3 heures ; pour la prévision des aurores, voir
+  gladys-astronomy.
+- Seuls les quatre groupes HF et les cinq phénomènes VHF du flux : pas de MUF (toujours « NoRpt »
+  dans le flux), pas de foF2.

@@ -1,177 +1,698 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "HamQSL",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "HF and VHF radio propagation for hams: solar flux, K index, band conditions, by N0NBH (HamQSL).",
+    "fr": "Propagation radio HF et VHF pour radioamateurs : flux solaire, indice K, état des bandes (N0NBH).",
+    "de": "KW- und UKW-Ausbreitung für Funkamateure: solarer Flux, K-Index, Bandzustände (N0NBH, HamQSL).",
+    "es": "Propagación de radio HF y VHF para radioaficionados: flujo solar, índice K, bandas (N0NBH)."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-hamqsl:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-hamqsl/main/cover.png",
+  "categories": ["environment", "services"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "HF propagation",
+        "fr": "Propagation HF",
+        "de": "KW-Ausbreitung",
+        "es": "Propagación HF"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Reads the public solar data feed of N0NBH (HamQSL), without an account: solar flux, sunspots, K and A indices, X-rays, solar wind and the HF band conditions by day and by night. Save, then create the device in the Discover tab.",
+        "fr": "Lit le flux public de données solaires de N0NBH (HamQSL), sans compte : flux solaire, taches, indices K et A, rayons X, vent solaire et l'état des bandes HF de jour et de nuit. Enregistrez, puis créez l'appareil dans l'onglet Découverte.",
+        "de": "Liest den öffentlichen Sonnendaten-Feed von N0NBH (HamQSL), ohne Konto: solarer Flux, Sonnenflecken, K- und A-Index, Röntgenstrahlung, Sonnenwind und die KW-Bandzustände bei Tag und Nacht. Speichere und lege dann das Gerät im Tab „Entdecken“ an.",
+        "es": "Lee el feed público de datos solares de N0NBH (HamQSL), sin cuenta: flujo solar, manchas, índices K y A, rayos X, viento solar y el estado de las bandas HF de día y de noche. Guarde y cree el dispositivo en la pestaña Descubrir."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-hamqsl/blob/main/docs/en.md",
+          "label": {
+            "en": "Setup guide",
+            "fr": "Guide d'installation",
+            "de": "Installationsanleitung",
+            "es": "Guía de instalación"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "about",
+      "type": "section",
+      "label": {
+        "en": "Source",
+        "fr": "Source",
+        "de": "Quelle",
+        "es": "Fuente"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
       "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+        "en": "Solar-terrestrial data courtesy of Paul Herrman, N0NBH (hamqsl.com). The band conditions are computed by N0NBH for the whole globe, not for your location. Not affiliated with HamQSL.",
+        "fr": "Données solaires et terrestres offertes par Paul Herrman, N0NBH (hamqsl.com). L'état des bandes est calculé par N0NBH pour le globe entier, pas pour votre position. Non affiliée à HamQSL.",
+        "de": "Sonnen- und Erddaten mit freundlicher Genehmigung von Paul Herrman, N0NBH (hamqsl.com). Die Bandzustände berechnet N0NBH für den ganzen Globus, nicht für deinen Standort. Nicht mit HamQSL verbunden.",
+        "es": "Datos solares y terrestres por cortesía de Paul Herrman, N0NBH (hamqsl.com). N0NBH calcula el estado de las bandas para todo el globo, no para su ubicación. Sin afiliación con HamQSL."
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
-      "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
-      "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+      "links": [
+        {
+          "url": "https://www.hamqsl.com/solar.html",
+          "label": {
+            "en": "HamQSL solar data",
+            "fr": "Données solaires HamQSL",
+            "de": "HamQSL-Sonnendaten",
+            "es": "Datos solares de HamQSL"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "refresh_interval",
+      "type": "select",
+      "label": {
+        "en": "Refresh interval",
+        "fr": "Fréquence de mise à jour",
+        "de": "Aktualisierungsintervall",
+        "es": "Frecuencia de actualización"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "N0NBH updates the feed about once an hour, and asks not to read it more often than every 30 minutes.",
+        "fr": "N0NBH met le flux à jour environ une fois par heure, et demande de ne pas le lire plus souvent que toutes les 30 minutes.",
+        "de": "N0NBH aktualisiert den Feed etwa einmal pro Stunde und bittet, ihn höchstens alle 30 Minuten zu lesen.",
+        "es": "N0NBH actualiza el feed aproximadamente una vez por hora y pide no leerlo con más frecuencia que cada 30 minutos."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": "60",
+      "options": [
+        {
+          "value": "30",
+          "label": {
+            "en": "30 minutes",
+            "fr": "30 minutes",
+            "de": "30 Minuten",
+            "es": "30 minutos"
+          }
+        },
+        {
+          "value": "60",
+          "label": {
+            "en": "1 hour",
+            "fr": "1 heure",
+            "de": "1 Stunde",
+            "es": "1 hora"
+          }
+        },
+        {
+          "value": "120",
+          "label": {
+            "en": "2 hours",
+            "fr": "2 heures",
+            "de": "2 Stunden",
+            "es": "2 horas"
+          }
+        },
+        {
+          "value": "180",
+          "label": {
+            "en": "3 hours",
+            "fr": "3 heures",
+            "de": "3 Stunden",
+            "es": "3 horas"
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the texts",
+        "fr": "Langue des textes",
+        "de": "Sprache der Texte",
+        "es": "Idioma de los textos"
+      },
+      "description": {
+        "en": "Names of the features (at their creation) and texts sent to the scenes.",
+        "fr": "Noms des fonctionnalités (à leur création) et textes envoyés aux scènes.",
+        "de": "Namen der Funktionen (bei ihrer Erstellung) und Texte, die an die Szenen gehen.",
+        "es": "Nombres de las funciones (al crearlas) y textos enviados a las escenas."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
+      "key": "check_now",
+      "label": {
+        "en": "Read the feed now",
+        "fr": "Lire le flux maintenant",
+        "de": "Feed jetzt lesen",
+        "es": "Leer el feed ahora"
+      },
+      "timeout_seconds": 60
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "band_good",
+      "label": {
+        "en": "HamQSL: a band becomes good",
+        "fr": "HamQSL : une bande devient bonne",
+        "de": "HamQSL: ein Band wird gut",
+        "es": "HamQSL: una banda pasa a buena"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "An HF band group goes from Poor or Fair to Good, by day or by night.",
+        "fr": "Un groupe de bandes HF passe de Mauvaise ou Moyenne à Bonne, de jour ou de nuit.",
+        "de": "Eine KW-Bandgruppe wechselt von Schlecht oder Mittel zu Gut, bei Tag oder Nacht.",
+        "es": "Un grupo de bandas HF pasa de Mala o Regular a Buena, de día o de noche."
       },
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "key": "band",
+          "type": "multi_select",
+          "label": {
+            "en": "Bands",
+            "fr": "Bandes",
+            "de": "Bänder",
+            "es": "Bandas"
+          },
+          "options": [
+            {
+              "value": "80m_40m",
+              "label": {
+                "en": "80-40 m",
+                "fr": "80-40 m",
+                "de": "80-40 m",
+                "es": "80-40 m"
+              }
+            },
+            {
+              "value": "30m_20m",
+              "label": {
+                "en": "30-20 m",
+                "fr": "30-20 m",
+                "de": "30-20 m",
+                "es": "30-20 m"
+              }
+            },
+            {
+              "value": "17m_15m",
+              "label": {
+                "en": "17-15 m",
+                "fr": "17-15 m",
+                "de": "17-15 m",
+                "es": "17-15 m"
+              }
+            },
+            {
+              "value": "12m_10m",
+              "label": {
+                "en": "12-10 m",
+                "fr": "12-10 m",
+                "de": "12-10 m",
+                "es": "12-10 m"
+              }
+            }
+          ]
         },
         {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "key": "period",
+          "type": "select",
+          "label": {
+            "en": "Day or night",
+            "fr": "Jour ou nuit",
+            "de": "Tag oder Nacht",
+            "es": "Día o noche"
+          },
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "day",
+              "label": {
+                "en": "Day",
+                "fr": "Jour",
+                "de": "Tag",
+                "es": "Día"
+              }
+            },
+            {
+              "value": "night",
+              "label": {
+                "en": "Night",
+                "fr": "Nuit",
+                "de": "Nacht",
+                "es": "Noche"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "band",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Band (80m_40m…)",
+            "fr": "Bande (80m_40m…)",
+            "de": "Band (80m_40m…)",
+            "es": "Banda (80m_40m…)"
+          }
+        },
+        {
+          "key": "period",
+          "type": "string",
+          "label": {
+            "en": "Period (day, night)",
+            "fr": "Période (day, night)",
+            "de": "Zeitraum (day, night)",
+            "es": "Período (day, night)"
+          }
+        },
+        {
+          "key": "band_name",
+          "type": "string",
+          "label": {
+            "en": "Band, as written (30-20 m)",
+            "fr": "Bande, en clair (30-20 m)",
+            "de": "Band, ausgeschrieben (30-20 m)",
+            "es": "Banda, en claro (30-20 m)"
+          }
+        },
+        {
+          "key": "period_name",
+          "type": "string",
+          "label": {
+            "en": "Day or night, in words",
+            "fr": "Jour ou nuit, en toutes lettres",
+            "de": "Tag oder Nacht, ausgeschrieben",
+            "es": "Día o noche, en palabras"
+          }
+        },
+        {
+          "key": "previous",
+          "type": "string",
+          "label": {
+            "en": "Previous condition (poor, fair)",
+            "fr": "Condition précédente (poor, fair)",
+            "de": "Vorheriger Zustand (poor, fair)",
+            "es": "Condición anterior (poor, fair)"
+          }
+        },
+        {
+          "key": "previous_name",
+          "type": "string",
+          "label": {
+            "en": "Previous condition, in words",
+            "fr": "Condition précédente, en toutes lettres",
+            "de": "Vorheriger Zustand, ausgeschrieben",
+            "es": "Condición anterior, en palabras"
+          }
+        },
+        {
+          "key": "solar_flux",
+          "type": "number",
+          "label": {
+            "en": "Solar flux (SFI)",
+            "fr": "Flux solaire (SFI)",
+            "de": "Solarflux (SFI)",
+            "es": "Flujo solar (SFI)"
+          }
+        },
+        {
+          "key": "k_index",
+          "type": "number",
+          "label": {
+            "en": "K index",
+            "fr": "Indice K",
+            "de": "K-Index",
+            "es": "Índice K"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary, in one sentence",
+            "fr": "Résumé, en une phrase",
+            "de": "Zusammenfassung in einem Satz",
+            "es": "Resumen, en una frase"
+          }
+        }
+      ]
+    },
+    {
+      "key": "geomagnetic_storm",
+      "label": {
+        "en": "HamQSL: geomagnetic storm",
+        "fr": "HamQSL : orage géomagnétique",
+        "de": "HamQSL: geomagnetischer Sturm",
+        "es": "HamQSL: tormenta geomagnética"
+      },
+      "description": {
+        "en": "The K index reaches 4 or more, then each time it climbs higher during the same episode.",
+        "fr": "L'indice K atteint 4 ou plus, puis chaque fois qu'il monte plus haut pendant le même épisode.",
+        "de": "Der K-Index erreicht 4 oder mehr, dann jedes Mal, wenn er in derselben Episode weiter steigt.",
+        "es": "El índice K alcanza 4 o más, y luego cada vez que sube más durante el mismo episodio."
+      },
+      "fields": [
+        {
+          "key": "k_index",
+          "type": "multi_select",
+          "label": {
+            "en": "K index",
+            "fr": "Indice K",
+            "de": "K-Index",
+            "es": "Índice K"
+          },
+          "options": [
+            {
+              "value": "4",
+              "label": {
+                "en": "K 4 (active)",
+                "fr": "K 4 (actif)",
+                "de": "K 4 (aktiv)",
+                "es": "K 4 (activo)"
+              }
+            },
+            {
+              "value": "5",
+              "label": {
+                "en": "K 5 (G1)",
+                "fr": "K 5 (G1)",
+                "de": "K 5 (G1)",
+                "es": "K 5 (G1)"
+              }
+            },
+            {
+              "value": "6",
+              "label": {
+                "en": "K 6 (G2)",
+                "fr": "K 6 (G2)",
+                "de": "K 6 (G2)",
+                "es": "K 6 (G2)"
+              }
+            },
+            {
+              "value": "7",
+              "label": {
+                "en": "K 7 (G3)",
+                "fr": "K 7 (G3)",
+                "de": "K 7 (G3)",
+                "es": "K 7 (G3)"
+              }
+            },
+            {
+              "value": "8",
+              "label": {
+                "en": "K 8 (G4)",
+                "fr": "K 8 (G4)",
+                "de": "K 8 (G4)",
+                "es": "K 8 (G4)"
+              }
+            },
+            {
+              "value": "9",
+              "label": {
+                "en": "K 9 (G5)",
+                "fr": "K 9 (G5)",
+                "de": "K 9 (G5)",
+                "es": "K 9 (G5)"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "k_index",
+          "type": "number",
+          "label": {
+            "en": "K index",
+            "fr": "Indice K",
+            "de": "K-Index",
+            "es": "Índice K"
+          }
+        },
+        {
+          "key": "a_index",
+          "type": "number",
+          "label": {
+            "en": "A index",
+            "fr": "Indice A",
+            "de": "A-Index",
+            "es": "Índice A"
+          }
+        },
+        {
+          "key": "g_scale",
+          "type": "string",
+          "label": {
+            "en": "NOAA scale (G0 to G5)",
+            "fr": "Échelle NOAA (G0 à G5)",
+            "de": "NOAA-Skala (G0 bis G5)",
+            "es": "Escala NOAA (G0 a G5)"
+          }
+        },
+        {
+          "key": "geomag_field",
+          "type": "string",
+          "label": {
+            "en": "Geomagnetic field, in words",
+            "fr": "Champ géomagnétique, en toutes lettres",
+            "de": "Erdmagnetfeld, ausgeschrieben",
+            "es": "Campo geomagnético, en palabras"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary, in one sentence",
+            "fr": "Résumé, en une phrase",
+            "de": "Zusammenfassung in einem Satz",
+            "es": "Resumen, en una frase"
+          }
+        }
+      ]
+    },
+    {
+      "key": "solar_flare",
+      "label": {
+        "en": "HamQSL: M or X solar flare",
+        "fr": "HamQSL : éruption solaire M ou X",
+        "de": "HamQSL: Sonneneruption M oder X",
+        "es": "HamQSL: fulguración solar M o X"
+      },
+      "description": {
+        "en": "The X-ray class rises to M or X: radio blackouts on the sunlit side of the Earth.",
+        "fr": "La classe des rayons X monte à M ou X : coupures radio sur la face éclairée de la Terre.",
+        "de": "Die Röntgenklasse steigt auf M oder X: Funkausfälle auf der Tagseite der Erde.",
+        "es": "La clase de rayos X sube a M o X: apagones de radio en la cara iluminada de la Tierra."
+      },
+      "fields": [
+        {
+          "key": "xray_class",
+          "type": "multi_select",
+          "label": {
+            "en": "Class",
+            "fr": "Classe",
+            "de": "Klasse",
+            "es": "Clase"
+          },
+          "options": [
+            {
+              "value": "M",
+              "label": {
+                "en": "M (moderate)",
+                "fr": "M (modérée)",
+                "de": "M (mittel)",
+                "es": "M (moderada)"
+              }
+            },
+            {
+              "value": "X",
+              "label": {
+                "en": "X (strong)",
+                "fr": "X (forte)",
+                "de": "X (stark)",
+                "es": "X (fuerte)"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "xray_class",
+          "type": "string",
+          "label": {
+            "en": "Class (M, X)",
+            "fr": "Classe (M, X)",
+            "de": "Klasse (M, X)",
+            "es": "Clase (M, X)"
+          }
+        },
+        {
+          "key": "xray",
+          "type": "string",
+          "label": {
+            "en": "X-ray level (M2.1…)",
+            "fr": "Niveau des rayons X (M2.1…)",
+            "de": "Röntgenwert (M2.1…)",
+            "es": "Nivel de rayos X (M2.1…)"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary, in one sentence",
+            "fr": "Résumé, en une phrase",
+            "de": "Zusammenfassung in einem Satz",
+            "es": "Resumen, en una frase"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "read_bulletin",
+      "label": {
+        "en": "HamQSL: read the propagation bulletin",
+        "fr": "HamQSL : lire le bulletin de propagation",
+        "de": "HamQSL: Ausbreitungsbericht lesen",
+        "es": "HamQSL: leer el boletín de propagación"
       },
-      "timeout_seconds": 15,
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ],
+      "description": {
+        "en": "The indices and the band conditions by day and by night, as one text to send by message or read aloud.",
+        "fr": "Les indices et l'état des bandes de jour et de nuit, en un texte à envoyer par message ou à lire à voix haute.",
+        "de": "Die Indizes und die Bandzustände bei Tag und Nacht als ein Text, den du als Nachricht senden oder vorlesen lassen kannst.",
+        "es": "Los índices y el estado de las bandas de día y de noche, en un texto para enviar por mensaje o leer en voz alta."
+      },
+      "timeout_seconds": 60,
       "outputs": [
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "text",
+          "type": "string",
+          "label": {
+            "en": "Bulletin, in one text",
+            "fr": "Bulletin, en un texte",
+            "de": "Bericht als ein Text",
+            "es": "Boletín, en un texto"
+          }
+        },
+        {
+          "key": "solar_flux",
+          "type": "number",
+          "label": {
+            "en": "Solar flux (SFI)",
+            "fr": "Flux solaire (SFI)",
+            "de": "Solarflux (SFI)",
+            "es": "Flujo solar (SFI)"
+          }
+        },
+        {
+          "key": "sunspots",
+          "type": "number",
+          "label": {
+            "en": "Sunspot number",
+            "fr": "Nombre de taches solaires",
+            "de": "Sonnenfleckenzahl",
+            "es": "Número de manchas solares"
+          }
+        },
+        {
+          "key": "k_index",
+          "type": "number",
+          "label": {
+            "en": "K index",
+            "fr": "Indice K",
+            "de": "K-Index",
+            "es": "Índice K"
+          }
+        },
+        {
+          "key": "a_index",
+          "type": "number",
+          "label": {
+            "en": "A index",
+            "fr": "Indice A",
+            "de": "A-Index",
+            "es": "Índice A"
+          }
+        },
+        {
+          "key": "xray",
+          "type": "string",
+          "label": {
+            "en": "X-ray class (B6.3…)",
+            "fr": "Classe des rayons X (B6.3…)",
+            "de": "Röntgenklasse (B6.3…)",
+            "es": "Clase de rayos X (B6.3…)"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "bands",
+      "label": {
+        "en": "HF band conditions",
+        "fr": "État des bandes HF",
+        "de": "KW-Bandzustände",
+        "es": "Estado de las bandas HF"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Solar flux, K and A indices, X-rays, and each HF band by day and by night.",
+        "fr": "Flux solaire, indices K et A, rayons X, et chaque bande HF de jour et de nuit.",
+        "de": "Solarflux, K- und A-Index, Röntgen und jedes KW-Band bei Tag und Nacht.",
+        "es": "Flujo solar, índices K y A, rayos X, y cada banda HF de día y de noche."
+      },
+      "icon": "radio"
     }
   ]
 }

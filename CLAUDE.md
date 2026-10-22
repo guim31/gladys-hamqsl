@@ -31,16 +31,19 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only (src/app.js), shutdown
+src/app.js                        every SDK handler, registered before connect()
+src/hamqsl.js                     HamQSL client: fetch + parse of solarxml.php (no XML library)
+src/monitor.js                    timer, states, scene triggers, connection status, widget refresh
+src/device.js                     the one device: features, names in four languages
+src/messages.js                   texts sent from the container (bulletin, status, summaries)
+src/widgets.js                    the `bands` widget
+src/actions.js                    scene action `read_bulletin`, configuration action `check_now`
+src/store.js                      trigger references under /data (hamqsl.json)
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+gladys-assistant-integration.json manifest: name, config_schema, triggers, actions, widget...
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (same sections)
+test/                             node --test, against the SDK's fake Gladys and a fake HamQSL
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +73,9 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German ("du") and Spanish
+  ("usted"): manifest texts, feature names, messages, widget, and
+  `docs/{en,fr,de,es}.md` with the same sections. `test/i18n.test.js` checks it.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -233,3 +237,25 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## HamQSL (propre à cette intégration)
+
+- Source : `https://www.hamqsl.com/solarxml.php` (N0NBH), XML plat d'environ 2 Ko, sans clé. Mis à jour
+  environ une fois par heure ; N0NBH demande **30 à 60 minutes au moins** entre deux lectures : les
+  intervalles proposés commencent à 30 min (un test le fige) et les actions réutilisent la dernière
+  lecture si elle date de moins d'un intervalle. User-Agent identifiable, crédit N0NBH dans le README
+  et les docs (testé).
+- Valeurs absentes : `No Report`, `NoRpt`, balise vide ou absente → `null`, aucun état publié (jamais
+  un faux 0). `muf`, `fof2` et `muffactor` sont toujours vides ou `NoRpt` : ignorés. `updated` porte
+  une espace en tête (` 22 Oct 2026 0542 GMT`).
+- Couples choisis faute de mieux dans le cœur : bandes en `signal/integer` 0..2 (le front dessine des
+  barres d'antenne d'après min/max : 0, 3, 5 barres) ; SFI, taches, K, A et Bz en
+  `counter-sensor/integer` (pas de couple décimal neutre ; Bz arrondi, bornes symétriques) ; vent
+  solaire en `speed-sensor/integer` sans unité (Gladys n'a pas de km/s : l'unité est dans le nom) ;
+  VHF en `input/binary`.
+- Déclencheurs : la première lecture (ou après perte de `/data/hamqsl.json`) sert de référence et ne
+  déclenche rien. Une bande à `No Report` garde sa référence. Orage : épisode ouvert à K ≥ 4, un
+  événement à chaque nouveau pic, fermé sous K 4. Éruption : la classe monte à M ou X par rapport à la
+  lecture précédente. Le filtre `k_index` est un `multi_select` de chaînes : le cœur convertit la
+  valeur numérique de l'événement en chaîne pour comparer.
+- Ne pas doublonner `guim31/gladys-astronomy` (Kp NOAA, aurores) : y renvoyer.

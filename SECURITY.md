@@ -30,6 +30,11 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+The integration reads one public, keyless feed (`https://www.hamqsl.com/solarxml.php`) over HTTPS
+and stores no secret. Under `/data` it keeps only `hamqsl.json`: the last band conditions, X-ray
+class and K index peak the scene triggers compare with. It opens no port and needs no access to
+the local network.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+and the HamQSL service.
