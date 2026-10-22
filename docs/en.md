@@ -1,61 +1,155 @@
-# Demo Devices Template
+# HamQSL
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+HF and VHF radio propagation in Gladys, for radio amateurs: the solar-terrestrial data and the band
+conditions that Paul Herrman, N0NBH, publishes on [hamqsl.com](https://www.hamqsl.com/solar.html) —
+the figures of the famous "solar banner" you see on so many ham websites.
 
 ## What you get
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+- A **"HF propagation (HamQSL)" device**: solar flux (SFI), sunspot number, K and A indices, X-ray
+  class, solar wind speed, Bz, signal noise, geomagnetic field, the condition of each HF band group
+  by day and by night (80-40 m, 30-20 m, 17-15 m, 12-10 m: Poor, Fair or Good), VHF aurora and
+  sporadic E (Es) openings, and the time of the last N0NBH update.
+- A **dashboard widget**, the band table: the main indices as tiles, then every band by day and by
+  night with a coloured dot.
+- **Three scene triggers**: a band becomes Good, a geomagnetic storm, an M or X class solar flare.
+- **One scene action**: the propagation bulletin in one text, to send by message or read aloud.
+
+Nothing to buy and no account: the feed is public. The integration only reads it.
+
+## Requirements
+
+- Gladys Assistant **5.1.0** or later (widgets, scene triggers and actions).
+- Internet access from Gladys to `www.hamqsl.com` (HTTPS).
+
+The integration is installed from GitHub: **Integrations → Install from GitHub**, address
+`https://github.com/guim31/gladys-hamqsl`.
 
 ## Configuration
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+| Setting               | Default | What it does                                                                                                                                           |
+| --------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Refresh interval      | 1 hour  | How often the feed is read: 30 minutes, 1, 2 or 3 hours. N0NBH updates it about once an hour and asks not to read it more often than every 30 minutes. |
+| Language of the texts | French  | Names of the features (at their creation) and texts sent to the scenes and the device (geomagnetic field, bulletin).                                   |
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+Save, then open the **Discover** tab and create the device. Its values arrive at once.
 
-## Actions
+The feature names are frozen when the device is created: change the language **before** creating
+it, or delete and create the device again.
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+## Device
 
-## Scenes
+All features are read-only and keep their history, except the texts.
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+| Feature                                                     | Type in Gladys  | Values                                                                                                                                       |
+| ----------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Solar flux (SFI)                                            | Counter         | 10.7 cm solar flux, in solar flux units. Above 100 the high bands open; above 150 they are excellent.                                        |
+| Sunspot number                                              | Counter         | The daily sunspot number.                                                                                                                    |
+| K index                                                     | Counter         | 0 to 9, planetary, every 3 hours. 4 = active, 5 and more = storm (G1 to G5).                                                                 |
+| A index                                                     | Counter         | 0 to 400, the daily average of the geomagnetic activity.                                                                                     |
+| X-ray class                                                 | Text            | `A`, `B`, `C`, `M` or `X` and a number (B6.3): the solar X-ray flux. M and X disturb HF on the sunlit side.                                  |
+| Solar wind (km/s)                                           | Speed           | In km/s (the unit is in the name: Gladys has no km/s unit).                                                                                  |
+| Bz (nT)                                                     | Counter         | The north-south component of the interplanetary magnetic field, rounded to the nanotesla. A strongly negative Bz favours storms and auroras. |
+| 80-40 m day … 12-10 m night                                 | Signal strength | 0 Poor, 1 Fair, 2 Good. The dashboard shows them as antenna bars (none, 3 or 5 bars).                                                        |
+| Signal noise                                                | Text            | The expected noise level on HF, as N0NBH writes it (S1-S2).                                                                                  |
+| Geomagnetic field                                           | Text            | Quiet, unsettled, active, minor or major storm… in the chosen language.                                                                      |
+| VHF aurora, Es Europe 6 m / 4 m / 2 m, Es North America 2 m | State of input  | 1 when N0NBH announces the opening, 0 when the band is closed.                                                                               |
+| N0NBH update                                                | Text            | Date and time of the data, in the time zone of Gladys.                                                                                       |
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+A value N0NBH does not publish ("No Report") is left out: the feature keeps its previous value,
+never a false 0. The device is refreshed by the integration itself; Gladys does not poll it.
 
-## Dashboard
+The K index and the auroras are here as HamQSL gives them, for the radio. For aurora watching (Kp
+forecast, aurora alerts), see the [gladys-astronomy](https://github.com/guim31/gladys-astronomy)
+integration, based on the NOAA data.
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+## Dashboard widget
+
+**HF band conditions**: four tiles (solar flux, K index, A index, X-rays), then one line per band
+group and period, the day first, with a green (Good), orange (Fair) or red (Poor) dot. The footer
+gives the source and the time of the N0NBH update, and a button opens hamqsl.com.
+
+Add it from the dashboard editor: **Add a widget → HamQSL → HF band conditions**. It has no setting.
+
+## Scene triggers
+
+**HamQSL: a band becomes good.** A band group goes from Poor or Fair to Good. Filters: the bands
+(empty = any) and day or night (empty = both). Variables: band (`80m_40m`…), period (`day`,
+`night`), band and period in words, previous condition, solar flux, K index, and a summary ("30-20
+m band good by day (SFI 115, K 2, A 19)").
+
+**HamQSL: geomagnetic storm.** The K index reaches 4 or more, then each time it climbs higher during
+the same episode; the episode ends when K drops below 4. A storm that climbs from K 5 to K 7 fires
+twice (K 5, then K 7); K 6 → 5 → 6 fires once. Filter: the K values (K 4 = active field, K 5 to 9 =
+storms G1 to G5); to be told of storms only, choose K 5 to K 9. Variables: K index, A index, NOAA
+scale (G0 to G5), geomagnetic field in words, summary.
+
+**HamQSL: M or X solar flare.** The X-ray class rises to M or X (C → M, M → X, or M again after a
+calmer reading). Filter: the class. Variables: class (`M`, `X`), level (M2.1), summary.
+
+The first reading after the installation is the starting point: it fires nothing. The references
+are kept in the data volume of the integration, so a restart neither fires again nor misses what
+changed in the meantime.
+
+## Scene action
+
+**HamQSL: read the propagation bulletin.** Outputs:
+
+- `text`: for example "HF propagation (N0NBH, 07:42): SFI 115, K 2, A 19, X-ray B6.3. Day: good on
+  30-20 m, fair on 80-40 m and 17-15 m, poor on 12-10 m. Night: good on 80-40 m and 30-20 m, fair
+  on 17-15 m, poor on 12-10 m.";
+- `solar_flux`, `sunspots`, `k_index`, `a_index` (numbers, empty when N0NBH has no value) and `xray`
+  (text).
+
+The feed is read again only if the last reading is older than the refresh interval. The **Read the
+feed now** button of the configuration page gives the indices and the good bands at once.
+
+## Scene examples
+
+- **Morning bulletin**: every day at 7:30, "HamQSL: read the propagation bulletin", then send the
+  `text` output by Telegram, or have it read by a speaker.
+- **Ten metres are open**: trigger "a band becomes good", band 12-10 m, day → notification "10 m is
+  open, time to call CQ!" with the summary variable.
+- **Storm warning**: trigger "geomagnetic storm", K 6 to K 9 → message with the summary, and a
+  reminder to look north at night if you live at high latitude.
+- **Blackout on the air**: trigger "M or X solar flare", class X → a notification explaining why
+  the HF bands went quiet on the day side.
+
+## Data source and usage policy
+
+The data come from the public XML feed of N0NBH, `https://www.hamqsl.com/solarxml.php`, read
+without an account or a key, with a User-Agent that names this integration. N0NBH updates it about
+once an hour and asks to read it every 30 to 60 minutes at most: the integration reads it every
+hour by default, and never more often than every 30 minutes (the actions reuse the last reading
+when it is recent enough).
+
+Solar-terrestrial data courtesy of Paul Herrman, N0NBH:
+[hamqsl.com/solar.html](https://www.hamqsl.com/solar.html). Thank you to him for this service,
+offered to the whole ham community for years.
+
+The band conditions are a **global** model computed by N0NBH from the indices: they are not
+measured at your location, nor for a given path. Not affiliated with HamQSL or N0NBH.
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"HamQSL feed unreachable"** in the configuration page: Gladys cannot reach `www.hamqsl.com`.
+  Check the internet access of Gladys; the last values are kept, and the integration tries again
+  at every interval.
+- **"The HamQSL feed has not been updated for N h"**: the feed answers, but N0NBH has not updated
+  it for more than 6 hours. Nothing to do on your side: it usually comes back by itself.
+- **A feature shows no value**: N0NBH publishes "No Report" for it (the solar flux sometimes, the
+  E-skip of North America…). It comes back with the next report.
+- **The feature names are in the wrong language**: they are frozen at creation. Change the language,
+  delete the device and create it again from the Discover tab.
+- **More details**: the logs of the integration (Integrations → HamQSL → logs). Set the `LOG_LEVEL`
+  environment variable to `debug` to see each reading.
+
+## Limits
+
+- The conditions are those of N0NBH's global model, updated hourly: a short opening, a local
+  condition or a given path are not in them.
+- The X-ray class is the flux at the time of the reading: a short flare between two readings can be
+  missed.
+- The K index is the planetary one, every 3 hours; for aurora forecasts, see gladys-astronomy.
+- Only the four HF groups and the five VHF phenomena of the feed: no MUF (always "NoRpt" in the
+  feed), no foF2.
