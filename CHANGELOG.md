@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-22
+
 ### Added
 
 - A "HF propagation (HamQSL)" device, from the public feed of N0NBH (hamqsl.com): solar flux,
@@ -21,3 +23,6 @@ the notes of the version's GitHub Release.
 - A scene action: the propagation bulletin in one text, with the main values.
 - A configuration action to read the feed at once.
 - Texts and documentation in English, French, German and Spanish.
+
+[Unreleased]: https://github.com/guim31/gladys-hamqsl/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-hamqsl/releases/tag/v1.0.0
