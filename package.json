@@ -1,6 +1,6 @@
 {
   "name": "gladys-hamqsl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Gladys Assistant integration: HF and VHF radio propagation from the HamQSL (N0NBH) solar data feed.",
   "type": "module",
